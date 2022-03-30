@@ -14,10 +14,20 @@ Tests:
     Traceback (most recent call last):
         ...
     ValueError
+    >>> prime_factors('Kodilla')
+    Traceback (most recent call last):
+        ...
+    ValueError
+    >>> prime_factors(22.22)
+    Traceback (most recent call last):
+        ...
+    ValueError
 """
 
 
 def prime_factors(number: int):
+    if not isinstance(number, int):
+        raise ValueError
     if number < 2:
         raise ValueError
     return [2, 2, 3]
