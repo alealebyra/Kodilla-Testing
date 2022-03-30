@@ -10,10 +10,14 @@ Tests:
     Traceback (most recent call last):
         ...
     ValueError
+    >>> prime_factors(-18)
+    Traceback (most recent call last):
+        ...
+    ValueError
 """
 
 
 def prime_factors(number: int):
-    if number in [0, 1]:
+    if number < 2:
         raise ValueError
     return [2, 2, 3]
