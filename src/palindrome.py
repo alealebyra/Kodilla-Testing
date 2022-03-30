@@ -18,14 +18,28 @@ Tests:
     True
     >>> is_palindrome('1aa1')
     True
+    >>> is_palindrome('!@#ee#@!')
+    True
     >>> is_palindrome(12321)
-    True
+    Traceback (most recent call last):
+        ...
+    ValueError
     >>> is_palindrome(12345321)
-    False
+    Traceback (most recent call last):
+        ...
+    ValueError
     >>> is_palindrome(12321.0)
-    False
+    Traceback (most recent call last):
+        ...
+    ValueError
+    >>> is_palindrome(12.3321)
+    Traceback (most recent call last):
+        ...
+    ValueError
     >>> is_palindrome(123.321)
-    True
+    Traceback (most recent call last):
+        ...
+    ValueError
     >>> is_palindrome(['q', 'd', 'e', 'd', 'q'])
     Traceback (most recent call last):
         ...
@@ -38,15 +52,12 @@ Tests:
     Traceback (most recent call last):
         ...
     ValueError
-    >>> is_palindrome('!@#ee#@!')
-    True
 """
 from datetime import datetime
-from typing import Union
 
 
-def is_palindrome(data: Union[str, int, float]):
-    if not isinstance(data, (str, int, float)):
+def is_palindrome(data: str):
+    if not isinstance(data, str):
         raise ValueError
-    data = str(data).lower().replace(' ', '')
+    data = data.lower().replace(' ', '')
     return data == data[::-1]
