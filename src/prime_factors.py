@@ -34,7 +34,6 @@ def prime_factors(number: int) -> list:
     if number < THE_LOWEST_FACTOR:
         raise ValueError
 
-    _add_flag: bool = True
     factor: int = THE_LOWEST_FACTOR
     prime_factors_list: list = []
 
