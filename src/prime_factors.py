@@ -4,6 +4,10 @@ Tests:
     [2, 2, 3]
     >>> prime_factors(2347)
     [2347]
+    >>> prime_factors(3958159172)
+    [2, 2, 11, 2347, 38329]
+    >>> prime_factors(748362597264573266)
+    [2, 2, 2, 2, 2, 2, 2, 3, 7, 1076167, 258703997]
     >>> prime_factors(0)
     Traceback (most recent call last):
         ...
