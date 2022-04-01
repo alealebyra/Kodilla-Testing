@@ -21,18 +21,18 @@ Tests:
     >>> prime_factors('Kodilla')
     Traceback (most recent call last):
         ...
-    ValueError
+    TypeError
     >>> prime_factors(22.22)
     Traceback (most recent call last):
         ...
-    ValueError
+    TypeError
 """
 THE_LOWEST_FACTOR: int = 2
 
 
 def prime_factors(number: int) -> list:
     if not isinstance(number, int):
-        raise ValueError
+        raise TypeError
     if number < THE_LOWEST_FACTOR:
         raise ValueError
 
