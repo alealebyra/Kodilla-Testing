@@ -23,41 +23,41 @@ Tests:
     >>> is_palindrome(12321)
     Traceback (most recent call last):
         ...
-    ValueError
+    TypeError
     >>> is_palindrome(12345321)
     Traceback (most recent call last):
         ...
-    ValueError
+    TypeError
     >>> is_palindrome(12321.0)
     Traceback (most recent call last):
         ...
-    ValueError
+    TypeError
     >>> is_palindrome(12.3321)
     Traceback (most recent call last):
         ...
-    ValueError
+    TypeError
     >>> is_palindrome(123.321)
     Traceback (most recent call last):
         ...
-    ValueError
+    TypeError
     >>> is_palindrome(['q', 'd', 'e', 'd', 'q'])
     Traceback (most recent call last):
         ...
-    ValueError
+    TypeError
     >>> is_palindrome(['q', 'd', 1, (1,2), 1, 'd', 'q'])
     Traceback (most recent call last):
         ...
-    ValueError
+    TypeError
     >>> is_palindrome(datetime(1111, 11, 11))
     Traceback (most recent call last):
         ...
-    ValueError
+    TypeError
 """
 from datetime import datetime
 
 
 def is_palindrome(data: str):
     if not isinstance(data, str):
-        raise ValueError
+        raise TypeError
     data = data.lower().replace(' ', '')
     return data == data[::-1]
