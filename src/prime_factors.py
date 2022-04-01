@@ -48,8 +48,6 @@ def prime_factors(number: int) -> list:
         else:
             factor += 1
 
-    if len(prime_factors_list) == 0:
-        prime_factors_list.append(number)
     return prime_factors_list
 
 
