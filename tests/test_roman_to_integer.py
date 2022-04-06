@@ -17,3 +17,8 @@ def test_empty_string():
     with pytest.raises(ValueError):
         roman_to_integer('')
 
+
+def test_not_correct_roman_number():
+    with pytest.raises(ValueError):
+        roman_to_integer('IIIV')
+
