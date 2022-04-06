@@ -26,3 +26,11 @@ def test_not_correct_roman_number():
 def test_too_big_roman_number():
     with pytest.raises(ValueError):
         roman_to_integer('MMMMMDC')
+
+
+def test_roman_number_with_smaller_before_bigger():
+    assert roman_to_integer('IX') == 9
+
+
+def test_roman_number_with_bigger_before_smaller():
+    assert roman_to_integer('VI') == 6
