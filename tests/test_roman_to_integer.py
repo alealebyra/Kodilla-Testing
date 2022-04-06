@@ -22,3 +22,7 @@ def test_not_correct_roman_number():
     with pytest.raises(ValueError):
         roman_to_integer('IIIV')
 
+
+def test_too_big_roman_number():
+    with pytest.raises(ValueError):
+        roman_to_integer('MMMMMDC')
