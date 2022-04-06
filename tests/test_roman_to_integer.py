@@ -11,3 +11,9 @@ def test_int_input_data_raises_type_error():
 def test_not_roman_signs_raises_value_error():
     with pytest.raises(ValueError):
         roman_to_integer('LXDMIXUHWDCS')
+
+
+def test_empty_string():
+    with pytest.raises(ValueError):
+        roman_to_integer('')
+
