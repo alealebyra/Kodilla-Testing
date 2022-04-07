@@ -4,7 +4,7 @@ import pytest
 
 
 def test_int_input_data_raises_type_error():
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         number_system_converter(13, 'roman')
 
 
@@ -16,6 +16,11 @@ def test_not_roman_signs_raises_value_error():
 def test_empty_string():
     with pytest.raises(ValueError):
         number_system_converter('', 'roman')
+
+
+def test_dec_number_zero():
+    with pytest.raises(ValueError):
+        number_system_converter(0, 'dec')
 
 
 def test_not_correct_roman_number():
@@ -41,5 +46,15 @@ def test_not_available_number_system():
         number_system_converter('CD', 'bin')
 
 
+def test_dec_number_with_wrong_system_number():
+    with pytest.raises(ValueError):
+        number_system_converter(13, 'roman')
+
+
+def test_roman_number_with_wrong_system_number():
+    with pytest.raises(ValueError):
+        number_system_converter('XLVII', 'dec')
+
+
 def test_dec_to_roman():
-    pass
+    assert number_system_converter(14, 'dec') == 'XIV'
