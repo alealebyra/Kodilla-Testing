@@ -15,7 +15,7 @@ def quiz_question():
 
 @pytest.fixture
 def quiz_taken(quiz_question):
-    quiz_taken = QuizTaken(uuid='2137', difficulty='medium', questions=[quiz_question, quiz_question])
+    quiz_taken = QuizTaken(uuid=uuid4().hex, difficulty='medium', questions=[quiz_question, quiz_question])
     return quiz_taken
 
 

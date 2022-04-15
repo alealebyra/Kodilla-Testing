@@ -12,6 +12,7 @@ def test_api_is_wsgi_app():
 #     app(init_database)
 
 
+# Czy mockowac Response?
 def test_global_vars_report():
     response = Response
     assert response == global_vars_report(response=response)
