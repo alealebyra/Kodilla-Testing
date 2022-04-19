@@ -33,16 +33,9 @@ def global_vars_report(response: Response) -> Response:
     return response
 
 
-def create_app():
-    app = Flask(__name__)
-    app.config.from_object(AppConfig())
-    app.before_first_request(init_database)
-    app.after_request(global_vars_report)
+app = Flask(__name__)
+app.config.from_object(AppConfig())
+app.before_first_request(init_database)
+app.after_request(global_vars_report)
 
-    __import__("quizzes.views")
-
-    return app
-
-
-app = create_app()
-# app.run()
+__import__("quizzes.views")

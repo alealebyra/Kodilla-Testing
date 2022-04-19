@@ -6,12 +6,9 @@ from flask_login import current_user
 from flask_user import login_required
 from requests import get
 
-from quizzes.app import create_app
+from quizzes.app import app
 from quizzes.forms import quiz_form_factory
 from quizzes.models import QuizTaken, QuizQuestion, quizzes_taken, calculate_points, QuizResult, quiz_results
-
-
-app = create_app()
 
 
 @app.route("/")
