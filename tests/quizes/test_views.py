@@ -72,4 +72,5 @@ def test_ranking_data(client, ):
     assert response.status_code == 200
 
     data = json.loads(response.get_data(as_text=True))
-    assert data[0] == 4
+    assert type(data) == dict
+    assert type(data['ranking']) == list
