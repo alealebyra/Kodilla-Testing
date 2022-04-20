@@ -7,7 +7,7 @@ from flask_login import FlaskLoginClient
 from werkzeug.test import Client
 
 from quizzes.app import app
-from quizzes.models import User, quiz_results, QuizResult, QuizTaken
+from quizzes.models import User, quiz_results, QuizResult, QuizTaken, quizzes_taken, QuizQuestion
 
 
 def check_response_status_code_and_template_name(client, captured_templates, endpoint, template_name):
@@ -78,6 +78,22 @@ def captured_templates():
         template_rendered.disconnect(record, app)
 
 
+@pytest.fixture
+def fake_quiz_taken():
+    quiz_taken = QuizTaken(
+        uuid="fake-quiz-taken",
+        difficulty="easy",
+        questions=[
+            QuizQuestion(
+                question="Hello world?",
+                correct_answer="Foo",
+                incorrect_answers=["Bar", "Baz", "Qux"],
+            )
+        ],
+    )
+    return quiz_taken
+
+
 @pytest.mark.parametrize('endpoint', ['/not-existing', '/sign-out'])
 def test_page_not_found(client, endpoint):
     assert client.get(endpoint).status_code == 404
@@ -132,7 +148,39 @@ def test_prepare_quiz_incorrect_difficulty(user):
         response = client.get(f'/quiz/prepare/very-hard')
         pook.get(
             f'https://opentdb.com/api.php?amount=10&difficulty=very-hard',
-            reply=302,  # HttpResponse.OK
+            reply=302,
             response_json={'uuid': 'fake-uuid', 'difficulty': 'very-hard', 'questions': []}
         )
         assert response.status_code == 302
+
+
+def test_take_quiz_raises_kay_error(user):
+    app.test_client_class = FlaskLoginClient
+    with app.test_client(user=user) as client:
+        response = client.get(f'/quiz/take/fake-quiz-taken')
+        assert response.location == '/quiz'
+
+
+def test_take_quiz(user, captured_templates, fake_quiz_taken):
+    quizzes_taken["fake-quiz-taken"] = fake_quiz_taken
+    app.test_client_class = FlaskLoginClient
+    with app.test_client(user=user) as client:
+        response = client.get(f'/quiz/take/fake-quiz-taken')
+        assert response.status_code == 200
+        quiz_results[user.id] = [QuizResult(1, 'fake-quiz-taken', 1)]
+        assert len(captured_templates) == 1
+        _, context = captured_templates[0]
+        assert 'form' in context
+
+
+def test_take_quiz_post_method(user, captured_templates, fake_quiz_taken):
+    quizzes_taken["fake-quiz-taken"] = fake_quiz_taken
+    app.test_client_class = FlaskLoginClient
+    with app.test_client(user=user) as client:
+        response = client.post(f'/quiz/take/fake-quiz-taken')
+        assert response.status_code == 200
+        quiz_results[user.id] = [QuizResult(1, 'fake-quiz-taken', 1)]
+        assert len(captured_templates) == 1
+        template, context = captured_templates[0]
+        assert template.name == 'take_quiz.html'
+        assert 'form' in context
