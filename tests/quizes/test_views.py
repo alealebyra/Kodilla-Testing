@@ -124,8 +124,7 @@ def test_ranking_data(client, ):
     assert response.status_code == 200
 
     data = json.loads(response.get_data(as_text=True))
-    assert type(data) == dict
-    assert type(data['ranking']) == list
+    assert 'ranking' in data
     assert data['ranking'][0] == {'points': 2, 'quiz_uuid': '4dc898c4f5c446be98104a70e03fb44c', 'user_id': 4}
 
 
@@ -167,10 +166,19 @@ def test_take_quiz(user, captured_templates, fake_quiz_taken):
     with app.test_client(user=user) as client:
         response = client.get(f'/quiz/take/fake-quiz-taken')
         assert response.status_code == 200
-        quiz_results[user.id] = [QuizResult(1, 'fake-quiz-taken', 1)]
         assert len(captured_templates) == 1
-        _, context = captured_templates[0]
+        template, context = captured_templates[0]
+        assert template.name == 'take_quiz.html'
         assert 'form' in context
+
+
+def test_take_quiz_post_method_with_form_validate(user, fake_quiz_taken):
+    quizzes_taken["fake-quiz-taken"] = fake_quiz_taken
+    app.test_client_class = FlaskLoginClient
+    with app.test_client(user=user) as client:
+        response = client.post(f'/quiz/take/fake-quiz-taken', data={'question_1': 'Foo'})
+        assert response.status_code == 302
+        assert quiz_results[user.id] == [QuizResult(user_id=1, quiz_uuid='fake-quiz-taken', points=1)]
 
 
 def test_take_quiz_post_method(user, captured_templates, fake_quiz_taken):
@@ -179,7 +187,6 @@ def test_take_quiz_post_method(user, captured_templates, fake_quiz_taken):
     with app.test_client(user=user) as client:
         response = client.post(f'/quiz/take/fake-quiz-taken')
         assert response.status_code == 200
-        quiz_results[user.id] = [QuizResult(1, 'fake-quiz-taken', 1)]
         assert len(captured_templates) == 1
         template, context = captured_templates[0]
         assert template.name == 'take_quiz.html'
