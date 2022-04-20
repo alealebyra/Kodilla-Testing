@@ -19,53 +19,37 @@ def check_response_status_code_and_template_name(client, captured_templates, end
 
 
 @pytest.fixture
-def quiz_taken():
-    return QuizTaken(
-        {"response_code": 0, "results":
-            [
-                {"category": "Entertainment: Film", "type": "multiple", "difficulty": "easy",
-                 "question": "Who starred in the film 1973 movie &quot;Enter The Dragon&quot;?",
-                 "correct_answer": "Bruce Lee",
-                 "incorrect_answers": ["Jackie Chan", "Jet Li", " Yun-Fat Chow"]},
-                {"category": "Science: Computers", "type": "multiple", "difficulty": "easy",
-                 "question": "What does GHz stand for?", "correct_answer": "Gigahertz",
-                 "incorrect_answers": ["Gigahotz", "Gigahetz", "Gigahatz"]},
-                {"category": "Geography", "type": "multiple", "difficulty": "easy",
-                 "question": "Which Russian oblast forms a border with Poland?",
-                 "correct_answer": "Kaliningrad",
-                 "incorrect_answers": ["Samara", "Nizhny Novgorod", "Omsk"]},
-                {"category": "Entertainment: Music", "type": "multiple", "difficulty": "easy",
-                 "question": "Which Twitch streamer is the vocalist for Red Vox?",
-                 "correct_answer": "Vinesauce",
-                 "incorrect_answers": ["The8BitDrummer", "LIRIK", "Sodapoppin"]},
-                {"category": "Entertainment: Video Games", "type": "boolean",
-                 "difficulty": "easy",
-                 "question": "Solid Snake is actually a clone from the DNA of Big Boss in the Metal Gear Solid series&#039; history.",
-                 "correct_answer": "True", "incorrect_answers": ["False"]},
-                {"category": "Entertainment: Video Games", "type": "boolean",
-                 "difficulty": "easy",
-                 "question": "Deus Ex (2000) does not feature the World Trade Center because it was destroyed by terrorist attacks according to the game&#039;s plot.",
-                 "correct_answer": "True", "incorrect_answers": ["False"]},
-                {"category": "Entertainment: Cartoon & Animations", "type": "multiple",
-                 "difficulty": "easy",
-                 "question": "Which of the following is not a Flintstones character?",
-                 "correct_answer": "Lord Rockingham IX",
-                 "incorrect_answers": ["Rockhead Slate", "The Great Gazoo", "Barney Rubble"]},
-                {"category": "Entertainment: Television", "type": "multiple",
-                 "difficulty": "easy",
-                 "question": "In Star Trek: The Next Generation, what is the name of Data&#039;s cat?",
-                 "correct_answer": "Spot", "incorrect_answers": ["Mittens", "Tom", "Kitty"]},
-                {"category": "General Knowledge", "type": "multiple", "difficulty": "easy",
-                 "question": "Which restaurant&#039;s mascot is a clown?",
-                 "correct_answer": "McDonald&#039;s",
-                 "incorrect_answers": ["Whataburger", "Burger King", "Sonic"]},
-                {"category": "Entertainment: Video Games", "type": "multiple",
-                 "difficulty": "easy", "question": "Who is the creator of Touhou project?",
-                 "correct_answer": "Zun",
-                 "incorrect_answers": ["Jun", "Twilight Frontier", "Tasofro"]},
-            ]
-         }
-    )
+def quiz_questions_list():
+    return [
+        {"question": "Who starred in the film 1973 movie &quot;Enter The Dragon&quot;?",
+         "correct_answer": "Bruce Lee",
+         "incorrect_answers": ["Jackie Chan", "Jet Li", " Yun-Fat Chow"]},
+        {"question": "What does GHz stand for?", "correct_answer": "Gigahertz",
+         "incorrect_answers": ["Gigahotz", "Gigahetz", "Gigahatz"]},
+        {"question": "Which Russian oblast forms a border with Poland?",
+         "correct_answer": "Kaliningrad",
+         "incorrect_answers": ["Samara", "Nizhny Novgorod", "Omsk"]},
+        {"question": "Which Twitch streamer is the vocalist for Red Vox?",
+         "correct_answer": "Vinesauce",
+         "incorrect_answers": ["The8BitDrummer", "LIRIK", "Sodapoppin"]},
+        {"question": "Solid Snake is actually a clone from the DNA of Big Boss in the Metal Gear Solid "
+                    "series&#039; history.",
+         "correct_answer": "True", "incorrect_answers": ["False"]},
+        {"question": "Deus Ex (2000) does not feature the World Trade Center because it was destroyed by "
+                     "terrorist attacks according to the game&#039;s plot.",
+         "correct_answer": "True", "incorrect_answers": ["False"]},
+        {"question": "Which of the following is not a Flintstones character?",
+         "correct_answer": "Lord Rockingham IX",
+         "incorrect_answers": ["Rockhead Slate", "The Great Gazoo", "Barney Rubble"]},
+        {"question": "In Star Trek: The Next Generation, what is the name of Data&#039;s cat?",
+         "correct_answer": "Spot", "incorrect_answers": ["Mittens", "Tom", "Kitty"]},
+        {"question": "Which restaurant&#039;s mascot is a clown?",
+         "correct_answer": "McDonald&#039;s",
+         "incorrect_answers": ["Whataburger", "Burger King", "Sonic"]},
+        {"question": "Who is the creator of Touhou project?",
+         "correct_answer": "Zun",
+         "incorrect_answers": ["Jun", "Twilight Frontier", "Tasofro"]},
+    ]
 
 
 @pytest.fixture
@@ -129,28 +113,26 @@ def test_ranking_data(client, ):
     assert data['ranking'][0] == {'points': 2, 'quiz_uuid': '4dc898c4f5c446be98104a70e03fb44c', 'user_id': 4}
 
 
-@pytest.mark.parametrize('difficulty', ['easy'])
-def test_prepare_quiz(difficulty, quiz_taken):
+@pytest.mark.parametrize('difficulty', ['easy', 'medium', 'hard'])
+def test_prepare_quiz(difficulty, user, quiz_questions_list):
     app.test_client_class = FlaskLoginClient
     with app.test_client(user=user) as client:
         response = client.get(f'/quiz/prepare/{difficulty}')
-        mock = pook.get(
+        pook.get(
             f'https://opentdb.com/api.php?amount=10&difficulty={difficulty}',
-            reply=302,  # HttpResponse.OK
-            response_json={quiz_taken}
+            reply=302,
+            response_json={'uuid': 'fake-uuid', 'difficulty': f'{difficulty}', 'questions': quiz_questions_list}
         )
+        assert response.status_code == 302
 
 
-def test_prepare_quiz_incorrect(difficulty, quiz_taken):
-    raise NotImplementedError
-
-
-def test_take_quiz(captured_templates):
+def test_prepare_quiz_incorrect_difficulty(user):
     app.test_client_class = FlaskLoginClient
     with app.test_client(user=user) as client:
-        response = client.get(f'/quiz/take/fake-quiz-taken')
-        assert response.location == '/ranking'
-        quiz_results[user.id] = [QuizResult(1, 'fake-quiz-taken', 1)]
-        assert len(captured_templates) == 1  # 'take_quiz.html' in captured_templates
-        _, context = captured_templates[0]
-        context['form']._fields
+        response = client.get(f'/quiz/prepare/very-hard')
+        pook.get(
+            f'https://opentdb.com/api.php?amount=10&difficulty=very-hard',
+            reply=302,  # HttpResponse.OK
+            response_json={'uuid': 'fake-uuid', 'difficulty': 'very-hard', 'questions': []}
+        )
+        assert response.status_code == 302
