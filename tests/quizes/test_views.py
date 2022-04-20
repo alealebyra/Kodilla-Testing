@@ -127,8 +127,7 @@ def test_ranking_data_sorted_by_points(client):
     ]
     response = client.get(template_name)
     assert response.status_code == 200
-
-    data = json.loads(response.get_data(as_text=True))
+    data = response.get_json()
     assert 'ranking' in data
     assert data['ranking'][0] == {'points': 5, 'quiz_uuid': '231898c4f5c446be98104a70e03fb44c', 'user_id': 2}
     assert data['ranking'][1] == {'points': 4, 'quiz_uuid': '1dc898c4f5c446be98104a70e03fb44c', 'user_id': 3}
@@ -164,6 +163,7 @@ def test_take_quiz_raises_kay_error(user):
     with app.test_client(user=user) as client:
         response = client.get(f'/quiz/take/fake-quiz-taken')
         assert response.location == '/quiz'
+        assert response.status_code == 302
 
 
 def test_take_quiz(user, captured_templates, fake_quiz_taken):
