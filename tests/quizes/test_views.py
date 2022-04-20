@@ -117,15 +117,21 @@ def test_sign_in(user, captured_templates, endpoint, template_name):
         check_response_status_code_and_template_name(client, captured_templates, endpoint, template_name)
 
 
-def test_ranking_data(client, ):
+def test_ranking_data_sorted_by_points(client):
     template_name = '/ranking.json'
-    quiz_results['ranking'] = [QuizResult(4, '4dc898c4f5c446be98104a70e03fb44c', 2)]
+    quiz_results['ranking'] = [
+        QuizResult(4, '4dc898c4f5c446be98104a70e03fb44c', 2),
+        QuizResult(2, '231898c4f5c446be98104a70e03fb44c', 5),
+        QuizResult(3, '1dc898c4f5c446be98104a70e03fb44c', 4),
+        QuizResult(1, '1ac898c4f5c446be98104a70e03fb44c', 4),
+    ]
     response = client.get(template_name)
     assert response.status_code == 200
 
     data = json.loads(response.get_data(as_text=True))
     assert 'ranking' in data
-    assert data['ranking'][0] == {'points': 2, 'quiz_uuid': '4dc898c4f5c446be98104a70e03fb44c', 'user_id': 4}
+    assert data['ranking'][0] == {'points': 5, 'quiz_uuid': '231898c4f5c446be98104a70e03fb44c', 'user_id': 2}
+    assert data['ranking'][1] == {'points': 4, 'quiz_uuid': '1dc898c4f5c446be98104a70e03fb44c', 'user_id': 3}
 
 
 @pytest.mark.parametrize('difficulty', ['easy', 'medium', 'hard'])
